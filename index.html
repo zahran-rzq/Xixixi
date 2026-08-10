@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xixixi Console - Bapak2 Edition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Animasi transisi tema */
+    body, .device, .d-pad, .center-btn, .brand, .brand span, .hint, .side-btn-label {
+      transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    body {
+      background-color: #c0c7cf; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Space Mono', monospace;
+      overflow: hidden;
+    }
+
+    /* Container Utama Perangkat (Landscape) */
+    .device {
+      width: 95vw;
+      max-width: 1100px;
+      height: 85vh;
+      max-height: 700px;
+      background: #e6e8eb;
+      background: linear-gradient(145deg, #f0f2f5, #e6e8eb);
+      border-radius: 40px;
+      padding: 30px;
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.15),
+        inset 0 4px 10px rgba(255, 255, 255, 0.9),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+    }
+
+    /* Bagian Kiri: Layar */
+    .device-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+    }
+
+    /* Bagian Kanan: Kontrol Cluster (Dial Sentral) */
+    .device-right {
+      width: 280px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .brand span {
+      font-size: 12px;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .led {
+      width: 10px;
+      height: 10px;
+      background-color: #ff3b30;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff3b30;
+      transition: background-color 0.3s;
+    }
+    
+    .led.active {
+      background-color: #4cd964;
+      box-shadow: 0 0 8px #4cd964;
+    }
+
+    /* Layar Perangkat */
+    .screen-bezel {
+      background-color: #111;
+      border-radius: 25px;
+      padding: 20px;
+      flex: 1;
+      box-shadow: 
+        inset 0 5px 15px rgba(0, 0, 0, 0.8),
+        0 2px 5px rgba(255, 255, 255, 0.5);
+      display: flex;
+      min-height: 0;
+    }
+
+    .screen {
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #2a2a2a; 
+      cursor: default; /* Kursor default */
+    }
+
+    /* Saat fullscreen, ubah kursor jadi pointer untuk menandakan bisa di-klik */
+    :fullscreen .screen {
+      cursor: pointer; 
+    }
+    :-webkit-full-screen .screen {
+      cursor: pointer;
+    }
+
+    .screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    .loading-text {
+      position: absolute;
+      color: #555;
+      font-size: 16px;
+      z-index: 0;
+    }
+
+    /* Terminal Overlay */
+    .terminal {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #0c0c0c;
+      color: #e6e6e6;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      z-index: 10;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      transition: opacity 0.2s ease; 
+    }
+    .terminal p { margin: 2px 0; }
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background-color: #e6e6e6;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Splash Screen Overlay */
+    .splash-screen {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #1a1a1a;
+      display: none; 
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 11;
+      opacity: 0;
+      transition: opacity 0.3s ease; 
+    }
+    .splash-logo {
+      font-size: 38px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+    .splash-logo span {
+      color: #ff5722; 
+    }
+    .splash-version {
+      font-size: 14px;
+      color: #888;
+      margin-top: 10px;
+      letter-spacing: 4px;
+    }
+
+    /* --- LAYOUT CONTROL CLUSTER KANAN --- */
+    .cluster-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    /* Side Pills (Power & Theme) */
+    .side-btn-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .side-btn-label {
+      font-size: 9px;
+      color: #888;
+      letter-spacing: 1px;
+    }
+    .pill-btn {
+      width: 12px;
+      height: 55px;
+      border-radius: 10px;
+      box-shadow: 
+        inset 0 2px 5px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+        0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .pill-btn:active { transform: scale(0.95); }
+    .pill-orange { background-color: #ff5722; }
+    .pill-gray { background-color: #7b838c; }
+
+    /* Sentral D-Pad (Media Control Center) */
+    .dial-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .d-pad {
+      width: 160px;
+      height: 160px;
+      background: #ffffff;
+      background: linear-gradient(145deg, #e6e8eb, #ffffff);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.1),
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* SVG Progress Ring / Indikator Dial */
+    .progress-ring {
+      position: absolute;
+      top: 0; left: 0;
+      transform: rotate(-90deg); 
+      pointer-events: none; 
+    }
+    .progress-ring circle {
+      transition: stroke-dashoffset 0.3s ease, stroke 0.4s ease;
+    }
+    .ring-bg {
+      stroke: #e0e0e0;
+    }
+
+    /* Tombol-tombol di ring */
+    .ring-btn {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      color: #999;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: color 0.2s, transform 0.1s;
+    }
+    .ring-btn:active { transform: scale(0.85); }
+    .ring-btn:hover { color: #555; }
+    
+    .ring-btn.active { color: #ff5722; } 
+    .ring-btn.top { top: 5px; color: #ff5722; } 
+    .ring-btn.bottom { bottom: 5px; }
+    .ring-btn.left { left: 5px; }
+    .ring-btn.right { right: 5px; }
+
+    /* Tombol NEXT Putih di Tengah */
+    .center-btn {
+      width: 70px;
+      height: 70px;
+      background: #ffffff;
+      background: linear-gradient(145deg, #ffffff, #e6e8eb);
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      box-shadow: 
+        0 8px 15px rgba(0, 0, 0, 0.1),
+        inset 0 3px 6px rgba(255, 255, 255, 0.9);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.4s ease, color 0.4s ease;
+      color: #888;
+      font-weight: bold;
+      font-size: 11px;
+      z-index: 20;
+    }
+    .center-btn:active {
+      transform: scale(0.95);
+      box-shadow: 
+        0 3px 5px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .hint {
+      font-size: 10px;
+      color: #888;
+      text-align: center;
+    }
+
+    /* API Credit */
+    .credit {
+      position: absolute;
+      bottom: 0;
+      font-size: 9px;
+      color: #888;
+      text-align: center;
+      width: 100%;
+    }
+    .credit a {
+      color: #ff5722;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* =========================================
+       DARK MODE STYLES
+       ========================================= */
+    body.dark-mode {
+      background-color: #121416;
+    }
+    body.dark-mode .device {
+      background: #24272b;
+      background: linear-gradient(145deg, #2b2e33, #24272b);
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.6),
+        inset 0 4px 10px rgba(255, 255, 255, 0.05),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.4);
+    }
+    body.dark-mode .brand { color: #eee; }
+    body.dark-mode .brand span { color: #777; }
+    
+    body.dark-mode .d-pad {
+      background: #24272b;
+      background: linear-gradient(145deg, #2b2e33, #24272b);
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.05),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+    }
+    body.dark-mode .center-btn {
+      background: #2b2e33;
+      background: linear-gradient(145deg, #33373e, #2b2e33);
+      color: #aaa;
+      box-shadow: 
+        0 8px 15px rgba(0, 0, 0, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .ring-bg {
+      stroke: #3a3f47;
+    }
+    body.dark-mode .hint, 
+    body.dark-mode .side-btn-label {
+      color: #666;
+    }
+
+    /* =========================================
+       MEDIA QUERIES UNTUK TAMPILAN MOBILE
+       ========================================= */
+    @media (max-width: 768px) {
+      .device {
+        flex-direction: column;
+        width: 92vw;
+        height: 95vh;
+        max-height: 900px;
+        padding: 20px 15px;
+        border-radius: 35px;
+        gap: 20px;
+      }
+
+      .device-left {
+        width: 100%;
+        flex: 1; 
+      }
+
+      .device-right {
+        width: 100%;
+        height: auto;
+        min-height: 220px; 
+        flex: none; 
+        justify-content: center;
+      }
+
+      .screen-bezel {
+        padding: 12px; 
+      }
+
+      .cluster-layout {
+        gap: 15px; 
+      }
+      
+      .splash-logo {
+        font-size: 28px; 
+      }
+
+      .credit {
+        bottom: -15px; 
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="device">
+    <!-- Bagian Kiri (Layar) -->
+    <div class="device-left">
+      <div class="device-header">
+        <div class="brand">xi.xi.xi <span>v3.0.0</span></div>
+        <div class="led" id="statusLed"></div>
+      </div>
+
+      <div class="screen-bezel">
+        <div class="screen" id="mainScreen" title="Tap saat fullscreen untuk Next">
+          
+          <!-- Terminal Booting -->
+          <div class="terminal" id="terminal">
+            <div id="terminal-content"></div>
+            <div class="cursor"></div>
+          </div>
+          
+          <!-- Splash Screen xi.xi.xi OS -->
+          <div class="splash-screen" id="splashScreen">
+            <div class="splash-logo">xi.xi.xi <span>OS</span></div>
+            <div class="splash-version">v3.0.0</div>
+          </div>
+
+          <div class="loading-text">Menyajikan Jokes...</div>
+          <img id="joke" src="" alt="Joke Bapak2" style="opacity: 0;" onload="this.style.opacity=1" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Bagian Kanan (Kontrol) -->
+    <div class="device-right">
+      
+      <!-- Cluster Layout Tengah -->
+      <div class="cluster-layout">
+        <!-- Power Pill Kiri -->
+        <div class="side-btn-group">
+          <div class="pill-btn pill-orange" onclick="location.reload()" title="Restart"></div>
+          <span class="side-btn-label">POWER</span>
+        </div>
+
+        <!-- Sentral Media Dial -->
+        <div class="dial-wrapper">
+          <div class="d-pad">
+            <!-- Lingkaran Indikator Durasi -->
+            <svg class="progress-ring" width="160" height="160">
+              <circle class="ring-bg" stroke-width="3" fill="transparent" r="70" cx="80" cy="80"/>
+              <circle id="intervalRing" stroke="#ff5722" stroke-width="4" stroke-linecap="round" fill="transparent" r="70" cx="80" cy="80" stroke-dasharray="439.8" stroke-dashoffset="300" />
+            </svg>
+
+            <!-- Top = Fullscreen -->
+            <button class="ring-btn top" id="fsBtn" title="Full Screen">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            </button>
+            
+            <!-- Left = Minus (Slower) -->
+            <button class="ring-btn left" id="slowerBtn" title="Durasi Lebih Lambat">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            
+            <!-- Right = Plus (Faster) -->
+            <button class="ring-btn right" id="fasterBtn" title="Durasi Lebih Cepat">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            
+            <!-- Bottom = Play/Pause Auto Play -->
+            <button class="ring-btn bottom" id="autoBtn" title="Auto Play Toggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </button>
+
+            <!-- Center = NEXT -->
+            <button class="center-btn" onclick="newJoke()" title="Next (Spasi)">NEXT</button>
+          </div>
+          <div class="hint" id="intervalDisplay">Durasi Auto: 5s</div>
+        </div>
+
+        <!-- Back Pill Kanan (Tombol THEME/Dark Mode) -->
+        <div class="side-btn-group">
+          <div class="pill-btn pill-gray" id="themeBtn" title="Toggle Dark Mode"></div>
+          <span class="side-btn-label">THEME</span>
+        </div>
+      </div>
+
+      <div class="credit">
+        API by <a href="https://jokesbapak2.reinaldyrafli.com/" target="_blank">Reinaldy Rafli</a>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    // --- 1. Terminal & Splash Screen Boot Animation ---
+    const bootSequence = [
+      "xi.xi.xi OS Edisi Pos Ronda initializing... xixixi",
+      "[OK] Memanaskan mesin motor Supra Bapak...",
+      "[OK] Sedang mencari kacamata (padahal ada di atas kepala)...",
+      "Menyambungkan ke WiFi Warkop (Password: tanyamasnya)...",
+      "[OK] Modul stiker WA 'Selamat Pagi Nusantara' berhasil dimuat.",
+      "Srupuuuuttt... Mari kita mulai ngakaknya, Pak! xixixi",
+      "tapi boong xixixi, ini cuma loading gimik doang, sabar ya Pak...",
+      "[OK] Semua modul siap digunakan. Silakan tekan tombol NEXT atau spasi untuk memulai."
+    ];
+    
+    const terminalContent = document.getElementById("terminal-content");
+    const terminal = document.getElementById("terminal");
+    const splashScreen = document.getElementById("splashScreen");
+    let bootIndex = 0;
+
+    function typeBootSequence() {
+      if (bootIndex < bootSequence.length) {
+        const p = document.createElement("p");
+        p.innerText = bootSequence[bootIndex];
+        terminalContent.appendChild(p);
+        bootIndex++;
+        // KETIKAN LEBIH CEPAT (10-30ms per baris)
+        setTimeout(typeBootSequence, Math.random() * 100 + 120); 
+      } else {
+        setTimeout(() => {
+          terminal.style.opacity = "0";
+          setTimeout(() => {
+            terminal.style.display = "none";
+            splashScreen.style.display = "flex";
+            setTimeout(() => {
+              splashScreen.style.opacity = "1";
+            }, 10);
+            setTimeout(() => {
+              splashScreen.style.opacity = "0";
+              setTimeout(() => {
+                splashScreen.style.display = "none";
+                document.getElementById("statusLed").classList.add("active"); // Lampu hijau
+                newJoke(); // Panggil joke pertama
+              }, 300);
+            }, 500); 
+          }, 200);
+        }, 150);
+      }
+    }
+
+    // Mulai seketika saat halaman dimuat
+    window.onload = () => { setTimeout(typeBootSequence, 50); };
+
+    // --- 2. Logic Fetch API ---
+    function newJoke() {
+      const imgElement = document.getElementById("joke");
+      imgElement.style.opacity = 0; 
+      setTimeout(() => {
+        imgElement.src = "https://jokesbapak2.reinaldyrafli.com/api/?t=" + new Date().getTime();
+      }, 200); 
+    }
+
+    // --- 3. Fitur Tombol Spasi ---
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space' && terminal.style.display === "none" && splashScreen.style.display === "none") {
+        event.preventDefault(); 
+        newJoke();
+      }
+    });
+
+    // --- 4. Logic Dial Ring (Auto Play & Durasi) ---
+    let slideInterval;
+    let isAutoPlay = false;
+    let intervalVal = 5; 
+    const minVal = 3;
+    const maxVal = 15;
+    
+    const autoBtn = document.getElementById("autoBtn");
+    const ring = document.getElementById("intervalRing");
+    const intervalDisplay = document.getElementById("intervalDisplay");
+
+    function updateDialVisual() {
+      intervalDisplay.innerText = `Durasi Auto: ${intervalVal}s`;
+      const circum = 439.8;
+      const percent = (intervalVal - minVal) / (maxVal - minVal);
+      const offset = circum - (percent * circum);
+      
+      ring.style.strokeDashoffset = offset;
+
+      if (isAutoPlay) {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(newJoke, intervalVal * 1000);
+      }
+    }
+
+    autoBtn.addEventListener("click", () => {
+      isAutoPlay = !isAutoPlay;
+      if (isAutoPlay) {
+        autoBtn.classList.add("active"); 
+        slideInterval = setInterval(newJoke, intervalVal * 1000);
+      } else {
+        autoBtn.classList.remove("active");
+        clearInterval(slideInterval);
+      }
+    });
+
+    document.getElementById("slowerBtn").addEventListener("click", () => {
+      if (intervalVal > minVal) {
+        intervalVal--;
+        updateDialVisual();
+      }
+    });
+
+    document.getElementById("fasterBtn").addEventListener("click", () => {
+      if (intervalVal < maxVal) {
+        intervalVal++;
+        updateDialVisual();
+      }
+    });
+
+    updateDialVisual();
+
+    // --- 5. Fitur Full Screen ---
+    const fsBtn = document.getElementById('fsBtn');
+    const mainScreen = document.getElementById('mainScreen'); 
+
+    fsBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        mainScreen.requestFullscreen().catch(err => {
+          alert(`Gagal masuk mode fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // --- 6. Fitur Dark Mode (Tombol THEME / Eks-BACK) ---
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // --- 7. Fitur Tap Layar untuk Next (Khusus Full Screen) ---
+    mainScreen.addEventListener('click', () => {
+      // Hanya berjalan jika berada dalam mode fullscreen dan terminal/splash sudah hilang
+      if (document.fullscreenElement && terminal.style.display === "none" && splashScreen.style.display === "none") {
+        newJoke();
+      }
+    });
+
+  </script>
+</body>
+</html>
