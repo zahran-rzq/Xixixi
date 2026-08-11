@@ -13,6 +13,11 @@
       padding: 0;
     }
 
+    /* Mencegah zoom saat double-tap pada tombol di HP */
+    a, button, .pill-btn, .screen, .ring-btn, .center-btn {
+      touch-action: manipulation;
+    }
+
     /* Animasi transisi tema */
     body, .device, .d-pad, .center-btn, .brand, .brand span, .hint, .side-btn-label {
       transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
@@ -24,16 +29,21 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      min-height: 100dvh; /* Mendukung Dynamic Viewport di browser modern */
+      padding: 10px; /* Jarak aman agar tidak menempel di tepi layar */
       font-family: 'Space Mono', monospace;
-      overflow: hidden;
+      overflow-y: auto; /* Izinkan scroll vertikal jika layar terlalu kecil */
+      overflow-x: hidden;
     }
 
-    /* Container Utama Perangkat (Landscape) */
+    /* Container Utama Perangkat (Desktop Default / Landscape) */
     .device {
-      width: 95vw;
+      width: 100%;
       max-width: 1100px;
-      height: 85vh;
+      height: calc(100vh - 40px);
+      height: calc(100dvh - 40px);
       max-height: 700px;
+      min-height: 400px;
       background: #e6e8eb;
       background: linear-gradient(145deg, #f0f2f5, #e6e8eb);
       border-radius: 40px;
@@ -124,17 +134,16 @@
       overflow: hidden;
       position: relative;
       border: 1px solid #2a2a2a; 
-      cursor: default; /* Kursor default */
+      cursor: default; 
     }
 
-    /* Saat fullscreen, ubah kursor jadi pointer untuk menandakan bisa di-klik */
-    :fullscreen .screen {
-      cursor: pointer; 
-    }
-    :-webkit-full-screen .screen {
-      cursor: pointer;
-    }
+    /* Saat fullscreen, ubah kursor jadi pointer */
+    :fullscreen .screen { cursor: pointer; }
+    :-webkit-full-screen .screen { cursor: pointer; }
+    :-moz-full-screen .screen { cursor: pointer; }
+    :-ms-fullscreen .screen { cursor: pointer; }
 
+    /* Pastikan gambar selalu utuh menggunakan object-fit: contain */
     .screen img {
       width: 100%;
       height: 100%;
@@ -166,6 +175,7 @@
       justify-content: flex-start;
       align-items: flex-start;
       transition: opacity 0.2s ease; 
+      overflow-y: auto;
     }
     .terminal p { margin: 2px 0; }
     .cursor {
@@ -195,10 +205,9 @@
       font-weight: 700;
       color: #fff;
       letter-spacing: 2px;
+      text-align: center;
     }
-    .splash-logo span {
-      color: #ff5722; 
-    }
+    .splash-logo span { color: #ff5722; }
     .splash-version {
       font-size: 14px;
       color: #888;
@@ -214,6 +223,7 @@
       justify-content: center;
       gap: 20px;
       width: 100%;
+      transition: transform 0.3s ease;
     }
 
     /* Side Pills (Power & Theme) */
@@ -266,7 +276,7 @@
       align-items: center;
     }
 
-    /* SVG Progress Ring / Indikator Dial */
+    /* SVG Progress Ring */
     .progress-ring {
       position: absolute;
       top: 0; left: 0;
@@ -276,9 +286,7 @@
     .progress-ring circle {
       transition: stroke-dashoffset 0.3s ease, stroke 0.4s ease;
     }
-    .ring-bg {
-      stroke: #e0e0e0;
-    }
+    .ring-bg { stroke: #e0e0e0; }
 
     /* Tombol-tombol di ring */
     .ring-btn {
@@ -298,7 +306,6 @@
     }
     .ring-btn:active { transform: scale(0.85); }
     .ring-btn:hover { color: #555; }
-    
     .ring-btn.active { color: #ff5722; } 
     .ring-btn.top { top: 5px; color: #ff5722; } 
     .ring-btn.bottom { bottom: 5px; }
@@ -344,6 +351,7 @@
       color: #888;
       text-align: center;
       width: 100%;
+      transition: bottom 0.3s;
     }
     .credit a {
       color: #ff5722;
@@ -354,9 +362,7 @@
     /* =========================================
        DARK MODE STYLES
        ========================================= */
-    body.dark-mode {
-      background-color: #121416;
-    }
+    body.dark-mode { background-color: #121416; }
     body.dark-mode .device {
       background: #24272b;
       background: linear-gradient(145deg, #2b2e33, #24272b);
@@ -384,55 +390,89 @@
         0 8px 15px rgba(0, 0, 0, 0.4),
         inset 0 3px 6px rgba(255, 255, 255, 0.05);
     }
-    body.dark-mode .ring-bg {
-      stroke: #3a3f47;
-    }
+    body.dark-mode .ring-bg { stroke: #3a3f47; }
     body.dark-mode .hint, 
-    body.dark-mode .side-btn-label {
-      color: #666;
-    }
+    body.dark-mode .side-btn-label { color: #666; }
 
     /* =========================================
        MEDIA QUERIES UNTUK TAMPILAN MOBILE
        ========================================= */
-    @media (max-width: 768px) {
+
+    /* 1. Mode Vertikal (Portrait) pada Smartphone */
+    @media (max-width: 850px) and (orientation: portrait) {
       .device {
         flex-direction: column;
-        width: 92vw;
-        height: 95vh;
-        max-height: 900px;
+        height: calc(100vh - 20px);
+        height: calc(100dvh - 20px);
+        /* Minimum height memaksa scroll jika layar terlalu pendek 
+           agar tidak ada bagian kontrol yang terpotong */
+        min-height: 650px; 
+        max-height: none;
         padding: 20px 15px;
         border-radius: 35px;
-        gap: 20px;
+        gap: 15px;
       }
 
       .device-left {
         width: 100%;
         flex: 1; 
+        min-height: 0; /* Penting agar flex child bisa menyusut */
       }
 
       .device-right {
         width: 100%;
         height: auto;
-        min-height: 220px; 
         flex: none; 
         justify-content: center;
+        padding-bottom: 25px; /* Ruang tambahan untuk teks credit */
       }
 
-      .screen-bezel {
-        padding: 12px; 
-      }
+      .screen-bezel { padding: 12px; }
 
       .cluster-layout {
-        gap: 15px; 
+        gap: 15px;
+        transform: scale(0.9); /* Sedikit mengecil agar aman di berbagai jenis layar */
       }
       
-      .splash-logo {
-        font-size: 28px; 
+      .splash-logo { font-size: 28px; }
+      .credit { bottom: 0px; }
+    }
+
+    /* 2. Mode Horizontal (Landscape) pada Smartphone (Layar Pendek) */
+    @media (max-height: 600px) and (orientation: landscape) {
+      body { padding: 5px; } /* Maksimalkan ruang layar */
+      
+      .device {
+        height: calc(100vh - 10px);
+        height: calc(100dvh - 10px);
+        min-height: 280px;
+        padding: 10px;
+        border-radius: 25px;
+        gap: 15px;
       }
 
+      .device-left {
+        flex: 1;
+        min-height: 0;
+      }
+
+      .device-right {
+        width: 220px; /* Kurangi area kanan */
+        flex: none;
+      }
+
+      /* Kunci utama: scale-down control panel agar pas horizontal */
+      .cluster-layout {
+        transform: scale(0.65); 
+        transform-origin: center center;
+      }
+
+      .screen-bezel { padding: 10px; }
+      .device-header { margin-bottom: 5px; }
+      
       .credit {
-        bottom: -15px; 
+        bottom: -15px; /* Offset dari scaling */
+        font-size: 10px;
       }
     }
   </style>
@@ -648,17 +688,27 @@
 
     updateDialVisual();
 
-    // --- 5. Fitur Full Screen ---
+    // --- 5. Fitur Full Screen (Ditingkatkan dukungannya untuk iOS Safari) ---
     const fsBtn = document.getElementById('fsBtn');
     const mainScreen = document.getElementById('mainScreen'); 
 
     fsBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        mainScreen.requestFullscreen().catch(err => {
-          alert(`Gagal masuk mode fullscreen: ${err.message}`);
-        });
+      const doc = window.document;
+      const docEl = mainScreen;
+
+      const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+      const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+      if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if(requestFullScreen) {
+            requestFullScreen.call(docEl).catch(err => {
+              console.warn(`Gagal masuk mode fullscreen: ${err.message}`);
+            });
+        }
       } else {
-        document.exitFullscreen();
+        if(cancelFullScreen) {
+            cancelFullScreen.call(doc);
+        }
       }
     });
 
@@ -671,7 +721,8 @@
     // --- 7. Fitur Tap Layar untuk Next (Khusus Full Screen) ---
     mainScreen.addEventListener('click', () => {
       // Hanya berjalan jika berada dalam mode fullscreen dan terminal/splash sudah hilang
-      if (document.fullscreenElement && terminal.style.display === "none" && splashScreen.style.display === "none") {
+      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+      if (isFullscreen && terminal.style.display === "none" && splashScreen.style.display === "none") {
         newJoke();
       }
     });
@@ -679,3 +730,4 @@
   </script>
 </body>
 </html>
+
