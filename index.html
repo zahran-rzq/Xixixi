@@ -8,32 +8,34 @@
   <!-- ========================================================================= -->
   <!-- MULAI BAGIAN SEO & META TAGS GOOGLE -->
   <!-- ========================================================================= -->
-  
-  <!-- Deskripsi Utama (Muncul di bawah judul pada pencarian Google) -->
   <meta name="description" content="Mainkan xixixi Console - Emulator Jokes Bapak-bapak Edition! Nikmati asupan tebak-tebakan receh dan lucu khas tongkrongan bapak-bapak dengan antarmuka retro.">
-  
-  <!-- Kata Kunci (Keywords) -->
   <meta name="keywords" content="jokes bapak bapak, tebak tebakan lucu, xixixi console, humor receh, game bapak bapak, hiburan, meme bapak">
   <meta name="author" content="Reinaldy Rafli & Zahran">
   <meta name="robots" content="index, follow">
   <meta name="language" content="Indonesian">
-  <meta name="theme-color" content="#c0c7cf"> <!-- Warna tema browser HP -->
+  <meta name="theme-color" content="#c0c7cf"> 
 
-  <!-- Open Graph / Facebook / WhatsApp (Agar saat link dishare muncul gambar & deskripsi) -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://jokesbapak2.zahran.my.id/"> <!-- Sesuaikan jika domain berubah -->
+  <meta property="og:url" content="https://jokesbapak2.zahran.my.id/"> 
   <meta property="og:title" content="xixixi Console - Jokes Bapak2 Edition">
   <meta property="og:description" content="Emulator retro khusus untuk asupan jokes receh dan tebak-tebakan ala bapak-bapak. Yuk ketawa bareng! xixixi...">
-  <meta property="og:image" content="https://api.dicebear.com/7.x/bottts/svg?seed=xixixi"> <!-- Ganti dengan URL gambar thumbnail/screenshot web aslimu -->
+  <meta property="og:image" content="https://api.dicebear.com/7.x/bottts/svg?seed=xixixi"> 
 
-  <!-- Twitter / X Cards -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://jokesbapak2.zahran.my.id/">
   <meta property="twitter:title" content="xixixi Console - Jokes Bapak2 Edition">
   <meta property="twitter:description" content="Emulator retro khusus untuk asupan jokes receh dan tebak-tebakan ala bapak-bapak. Yuk ketawa bareng! xixixi...">
-  <meta property="twitter:image" content="https://api.dicebear.com/7.x/bottts/svg?seed=xixixi"> <!-- Ganti dengan URL gambar thumbnail/screenshot web aslimu -->
+  <meta property="twitter:image" content="https://api.dicebear.com/7.x/bottts/svg?seed=xixixi"> 
+  <!-- ========================================================================= -->
 
-  <!-- Schema.org / JSON-LD (Memberitahu Google bahwa ini adalah Web Application/Game) -->
+  <!-- ========================================================================= -->
+  <!-- ICON WEB (FAVICON) -->
+  <!-- ========================================================================= -->
+  <!-- Ganti "icon.png" dengan link atau nama file gambarmu yang sudah di-upload -->
+  <link rel="icon" type="image/png" href="https://api.dicebear.com/7.x/fun-emoji/svg?seed=dark_orange_dadjokes">
+  <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/fun-emoji/svg?seed=dark_orange_dadjokes">
+  <!-- ========================================================================= -->
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -49,10 +51,6 @@
     }
   }
   </script>
-
-  <!-- ========================================================================= -->
-  <!-- SELESAI BAGIAN SEO -->
-  <!-- ========================================================================= -->
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
@@ -454,8 +452,6 @@
         flex-direction: column;
         height: calc(100vh - 20px);
         height: calc(100dvh - 20px);
-        /* Minimum height memaksa scroll jika layar terlalu pendek 
-           agar tidak ada bagian kontrol yang terpotong */
         min-height: 650px; 
         max-height: none;
         padding: 20px 15px;
@@ -466,7 +462,7 @@
       .device-left {
         width: 100%;
         flex: 1; 
-        min-height: 0; /* Penting agar flex child bisa menyusut */
+        min-height: 0; 
       }
 
       .device-right {
@@ -474,23 +470,23 @@
         height: auto;
         flex: none; 
         justify-content: center;
-        padding-bottom: 25px; /* Ruang tambahan untuk teks credit */
+        padding-bottom: 25px; 
       }
 
       .screen-bezel { padding: 12px; }
 
       .cluster-layout {
         gap: 15px;
-        transform: scale(0.9); /* Sedikit mengecil agar aman di berbagai jenis layar */
+        transform: scale(0.9); 
       }
       
       .splash-logo { font-size: 28px; }
       .credit { bottom: 0px; }
     }
 
-    /* 2. Mode Horizontal (Landscape) pada Smartphone (Layar Pendek) */
+    /* 2. Mode Horizontal (Landscape) pada Smartphone */
     @media (max-height: 600px) and (orientation: landscape) {
-      body { padding: 5px; } /* Maksimalkan ruang layar */
+      body { padding: 5px; } 
       
       .device {
         height: calc(100vh - 10px);
@@ -507,11 +503,10 @@
       }
 
       .device-right {
-        width: 220px; /* Kurangi area kanan */
+        width: 220px; 
         flex: none;
       }
 
-      /* Kunci utama: scale-down control panel agar pas horizontal */
       .cluster-layout {
         transform: scale(0.65); 
         transform-origin: center center;
@@ -521,7 +516,7 @@
       .device-header { margin-bottom: 5px; }
       
       .credit {
-        bottom: -15px; /* Offset dari scaling */
+        bottom: -15px; 
         font-size: 10px;
       }
     }
@@ -642,7 +637,6 @@
         p.innerText = bootSequence[bootIndex];
         terminalContent.appendChild(p);
         bootIndex++;
-        // KETIKAN LEBIH CEPAT (10-30ms per baris)
         setTimeout(typeBootSequence, Math.random() * 100 + 120); 
       } else {
         setTimeout(() => {
@@ -657,8 +651,8 @@
               splashScreen.style.opacity = "0";
               setTimeout(() => {
                 splashScreen.style.display = "none";
-                document.getElementById("statusLed").classList.add("active"); // Lampu hijau
-                newJoke(); // Panggil joke pertama
+                document.getElementById("statusLed").classList.add("active"); 
+                newJoke(); 
               }, 300);
             }, 500); 
           }, 200);
@@ -666,7 +660,6 @@
       }
     }
 
-    // Mulai seketika saat halaman dimuat
     window.onload = () => { setTimeout(typeBootSequence, 50); };
 
     // --- 2. Logic Fetch API ---
@@ -738,7 +731,7 @@
 
     updateDialVisual();
 
-    // --- 5. Fitur Full Screen (Ditingkatkan dukungannya untuk iOS Safari) ---
+    // --- 5. Fitur Full Screen ---
     const fsBtn = document.getElementById('fsBtn');
     const mainScreen = document.getElementById('mainScreen'); 
 
@@ -770,7 +763,6 @@
 
     // --- 7. Fitur Tap Layar untuk Next (Khusus Full Screen) ---
     mainScreen.addEventListener('click', () => {
-      // Hanya berjalan jika berada dalam mode fullscreen dan terminal/splash sudah hilang
       const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       if (isFullscreen && terminal.style.display === "none" && splashScreen.style.display === "none") {
         newJoke();
