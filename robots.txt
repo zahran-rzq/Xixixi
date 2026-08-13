@@ -1,0 +1,7 @@
+# robots.txt
+# Mengizinkan mesin pencari melakukan crawling pada situs.
+User-agent: *
+Allow: /
+
+# Sitemap utama
+Sitemap: https://jokesbapak2.zahran.my.id/sitemap.xml

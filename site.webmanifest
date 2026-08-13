@@ -1,0 +1,10 @@
+{
+  "name": "xixixi Console - Bapak2 Edition",
+  "short_name": "xixixi Console",
+  "description": "Emulator retro interaktif berisi jokes dan tebak-tebakan ala bapak-bapak Indonesia.",
+  "start_url": "/",
+  "display": "standalone",
+  "lang": "id",
+  "theme_color": "#c0c7cf",
+  "background_color": "#1a1a1a"
+}
